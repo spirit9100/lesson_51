@@ -1,172 +1,165 @@
-import flet as ft
+import flet as ft  # Импортируем фреймворк Flet для создания UI
 
-class AppStyles:
-    PAGE_SETTINGS = {
-        "title": "AI Chat",
-        "vertical_alignment": ft.MainAxisAlignment.CENTER,
-        "horizontal_alignment": ft.CrossAxisAlignment.CENTER,
-        "padding": 20,
-        "bgcolor": ft.Colors.GREY_900,  # Темный фон
-        "theme_mode": ft.ThemeMode.DARK,
+class AppStyles:  # Класс для централизованного хранения всех стилей приложения
+    PAGE_SETTINGS = {  # Настройки главной страницы приложения
+        "title": "AI Chat",  # Заголовок окна приложения
+        "vertical_alignment": ft.MainAxisAlignment.CENTER,  # Вертикальное выравнивание по центру
+        "horizontal_alignment": ft.CrossAxisAlignment.CENTER,  # Горизонтальное выравнивание по центру
+        "padding": 20,  # Отступы от краев окна
+        "bgcolor": ft.Colors.GREY_900,  # Темно-серый цвет фона
+        "theme_mode": ft.ThemeMode.DARK,  # Темная тема оформления
     }
 
-    
-    CHAT_HISTORY = {
-        "expand": True,
-        "spacing": 10,
-        "height": 400,
-        "auto_scroll": True,
-        "padding": 20,
+    CHAT_HISTORY = {  # Настройки для области истории чата
+        "expand": True,  # Разрешаем расширение на доступное пространство
+        "spacing": 10,  # Отступ между сообщениями
+        "height": 400,  # Высота области чата
+        "auto_scroll": True,  # Автоматическая прокрутка к новым сообщениям
+        "padding": 20,  # Внутренние отступы
     }
 
-    MESSAGE_INPUT = {
-        "width": 400,  # Уменьшаем ширину для места под кнопку
-        "height": 50,
-        "multiline": False,
-        "text_size": 16,
-        "color": ft.Colors.WHITE,
-        "bgcolor": ft.Colors.GREY_800,
-        "border_color": ft.Colors.BLUE_400,
-        "cursor_color": ft.Colors.WHITE,
-        "content_padding": 10,
-        "border_radius": 8,
-        "hint_text": "Введите сообщение здесь...",
-        "shift_enter": True,
+    MESSAGE_INPUT = {  # Настройки поля ввода сообщений
+        "width": 400,  # Ширина поля ввода
+        "height": 50,  # Высота поля ввода
+        "multiline": False,  # Однострочный режим ввода
+        "text_size": 16,  # Размер шрифта
+        "color": ft.Colors.WHITE,  # Цвет текста
+        "bgcolor": ft.Colors.GREY_800,  # Цвет фона поля ввода
+        "border_color": ft.Colors.BLUE_400,  # Цвет границы
+        "cursor_color": ft.Colors.WHITE,  # Цвет курсора
+        "content_padding": 10,  # Внутренние отступы
+        "border_radius": 8,  # Скругление углов
+        "hint_text": "Введите сообщение здесь...",  # Подсказка в пустом поле
+        "shift_enter": True,  # Включение отправки по Shift+Enter
     }
 
-    SEND_BUTTON = {
-        "text": "Отправка",
-        "icon": ft.icons.SEND,
-        "style": ft.ButtonStyle(
-            color=ft.Colors.WHITE,
-            bgcolor=ft.Colors.BLUE_700,
-            padding=10,
+    SEND_BUTTON = {  # Настройки кнопки отправки
+        "text": "Отправка",  # Текст на кнопке
+        "icon": ft.icons.SEND,  # Иконка отправки
+        "style": ft.ButtonStyle(  # Стиль кнопки
+            color=ft.Colors.WHITE,  # Цвет текста
+            bgcolor=ft.Colors.BLUE_700,  # Цвет фона
+            padding=10,  # Внутренние отступы
         ),
-        "tooltip": "Отправить сообщение",
-        "height": 40,  
-        "width": 130,
+        "tooltip": "Отправить сообщение",  # Всплывающая подсказка
+        "height": 40,  # Высота кнопки
+        "width": 130,  # Ширина кнопки
     }
 
-    SAVE_BUTTON = {
-        "text": "Сохранить",
-        "icon": ft.icons.SAVE,
-        "style": ft.ButtonStyle(
-            color=ft.Colors.WHITE,
-            bgcolor=ft.Colors.BLUE_700,
-            padding=10,
+    SAVE_BUTTON = {  # Настройки кнопки сохранения
+        "text": "Сохранить",  # Текст на кнопке
+        "icon": ft.icons.SAVE,  # Иконка сохранения
+        "style": ft.ButtonStyle(  # Стиль кнопки
+            color=ft.Colors.WHITE,  # Цвет текста
+            bgcolor=ft.Colors.BLUE_700,  # Цвет фона
+            padding=10,  # Внутренние отступы
         ),
-        "tooltip": "Сохранить диалог в файл",
-        "width": 130,
-        "height": 40,
+        "tooltip": "Сохранить диалог в файл",  # Всплывающая подсказка
+        "width": 130,  # Ширина кнопки
+        "height": 40,  # Высота кнопки
     }
 
-    CLEAR_BUTTON = {
-        "text": "Очистить",
-        "icon": ft.icons.DELETE,
-        "style": ft.ButtonStyle(
-            color=ft.Colors.WHITE,
-            bgcolor=ft.Colors.RED_700,
-            padding=10,
+    CLEAR_BUTTON = {  # Настройки кнопки очистки
+        "text": "Очистить",  # Текст на кнопке
+        "icon": ft.icons.DELETE,  # Иконка удаления
+        "style": ft.ButtonStyle(  # Стиль кнопки
+            color=ft.Colors.WHITE,  # Цвет текста
+            bgcolor=ft.Colors.RED_700,  # Красный цвет фона
+            padding=10,  # Внутренние отступы
         ),
-        "tooltip": "Очистить историю чата",
-        "width": 130,
-        "height": 40,
+        "tooltip": "Очистить историю чата",  # Всплывающая подсказка
+        "width": 130,  # Ширина кнопки
+        "height": 40,  # Высота кнопки
     }
 
-    ANALYTICS_BUTTON = {
-        "text": "Аналитика",
-        "icon": ft.icons.ANALYTICS,
-        "style": ft.ButtonStyle(
-            color=ft.Colors.WHITE,
-            bgcolor=ft.Colors.GREEN_700,
-            padding=10,
+    ANALYTICS_BUTTON = {  # Настройки кнопки аналитики
+        "text": "Аналитика",  # Текст на кнопке
+        "icon": ft.icons.ANALYTICS,  # Иконка аналитики
+        "style": ft.ButtonStyle(  # Стиль кнопки
+            color=ft.Colors.WHITE,  # Цвет текста
+            bgcolor=ft.Colors.GREEN_700,  # Зеленый цвет фона
+            padding=10,  # Внутренние отступы
         ),
-        "tooltip": "Показать аналитику",
-        "width": 130,
-        "height": 40,
+        "tooltip": "Показать аналитику",  # Всплывающая подсказка
+        "width": 130,  # Ширина кнопки
+        "height": 40,  # Высота кнопки
     }
 
-    # Добавляем стили для рядов и колонок
-    INPUT_ROW = {
-        "spacing": 10,
-        "alignment": ft.MainAxisAlignment.SPACE_BETWEEN,
-        "width": 920,  # Общая ширина строки ввода
+    INPUT_ROW = {  # Настройки строки ввода
+        "spacing": 10,  # Отступ между элементами
+        "alignment": ft.MainAxisAlignment.SPACE_BETWEEN,  # Выравнивание с распределением пространства
+        "width": 920,  # Общая ширина строки
     }
 
-    CONTROL_BUTTONS_ROW = {
-        "spacing": 20,
-        "alignment": ft.MainAxisAlignment.CENTER,
+    CONTROL_BUTTONS_ROW = {  # Настройки строки с кнопками управления
+        "spacing": 20,  # Отступ между кнопками
+        "alignment": ft.MainAxisAlignment.CENTER,  # Выравнивание по центру
     }
 
-    CONTROLS_COLUMN = {
-        "spacing": 20,
-        "horizontal_alignment": ft.CrossAxisAlignment.CENTER,
+    CONTROLS_COLUMN = {  # Настройки колонки с элементами управления
+        "spacing": 20,  # Отступ между элементами
+        "horizontal_alignment": ft.CrossAxisAlignment.CENTER,  # Горизонтальное выравнивание по центру
     }
-    
-            
-    
 
-    MAIN_COLUMN = {
-        "expand": True,
-        "spacing": 20,
-        "alignment": ft.MainAxisAlignment.CENTER,
-        "horizontal_alignment": ft.CrossAxisAlignment.CENTER,
+    MAIN_COLUMN = {  # Настройки главной колонки
+        "expand": True,  # Разрешаем расширение
+        "spacing": 20,  # Отступ между элементами
+        "alignment": ft.MainAxisAlignment.CENTER,  # Вертикальное выравнивание по центру
+        "horizontal_alignment": ft.CrossAxisAlignment.CENTER,  # Горизонтальное выравнивание по центру
     }
-    
-        
-    MODEL_SEARCH_FIELD = {
-        "width": 400,
-        "border_radius": 8,
-        "bgcolor": ft.Colors.GREY_900,
-        "border_color": ft.Colors.GREY_700,
-        "color": ft.Colors.WHITE,
-        "content_padding": 10,
-        "cursor_color": ft.Colors.WHITE,
-        "focused_border_color": ft.Colors.BLUE_400,
-        "focused_bgcolor": ft.Colors.GREY_800,
-        "hint_style": ft.TextStyle(
-            color=ft.Colors.GREY_400,
-            size=14,
+
+    MODEL_SEARCH_FIELD = {  # Настройки поля поиска модели
+        "width": 400,  # Ширина поля
+        "border_radius": 8,  # Скругление углов
+        "bgcolor": ft.Colors.GREY_900,  # Цвет фона
+        "border_color": ft.Colors.GREY_700,  # Цвет границы
+        "color": ft.Colors.WHITE,  # Цвет текста
+        "content_padding": 10,  # Внутренние отступы
+        "cursor_color": ft.Colors.WHITE,  # Цвет курсора
+        "focused_border_color": ft.Colors.BLUE_400,  # Цвет границы при фокусе
+        "focused_bgcolor": ft.Colors.GREY_800,  # Цвет фона при фокусе
+        "hint_style": ft.TextStyle(  # Стиль текста-подсказки
+            color=ft.Colors.GREY_400,  # Цвет подсказки
+            size=14,  # Размер шрифта
         ),
-        "prefix_icon": ft.icons.SEARCH,
-        "height": 45,
+        "prefix_icon": ft.icons.SEARCH,  # Иконка поиска
+        "height": 45,  # Высота поля
     }
 
-    MODEL_DROPDOWN = {
-        "width": 400,
-        "height": 45,
-        "border_radius": 8,
-        "bgcolor": ft.Colors.GREY_900,
-        "border_color": ft.Colors.GREY_700,
-        "color": ft.Colors.WHITE,
-        "content_padding": 10,
-        "focused_border_color": ft.Colors.BLUE_400,
-        "focused_bgcolor": ft.Colors.GREY_800,
+    MODEL_DROPDOWN = {  # Настройки выпадающего списка моделей
+        "width": 400,  # Ширина списка
+        "height": 45,  # Высота списка
+        "border_radius": 8,  # Скругление углов
+        "bgcolor": ft.Colors.GREY_900,  # Цвет фона
+        "border_color": ft.Colors.GREY_700,  # Цвет границы
+        "color": ft.Colors.WHITE,  # Цвет текста
+        "content_padding": 10,  # Внутренние отступы
+        "focused_border_color": ft.Colors.BLUE_400,  # Цвет границы при фокусе
+        "focused_bgcolor": ft.Colors.GREY_800,  # Цвет фона при фокусе
     }
 
-    MODEL_SELECTION_COLUMN = {
-        "spacing": 10,
-        "horizontal_alignment": ft.CrossAxisAlignment.CENTER,
-        "width": 400,
-    }
-    
-    BALANCE_TEXT = {
-        "size": 16,
-        "color": ft.Colors.GREEN_400,
-        "weight": ft.FontWeight.BOLD,
+    MODEL_SELECTION_COLUMN = {  # Настройки колонки выбора модели
+        "spacing": 10,  # Отступ между элементами
+        "horizontal_alignment": ft.CrossAxisAlignment.CENTER,  # Горизонтальное выравнивание по центру
+        "width": 400,  # Ширина колонки
     }
 
-    BALANCE_CONTAINER = {
-        "padding": 10,
-        "bgcolor": ft.Colors.GREY_900,
-        "border_radius": 8,
-        "border": ft.border.all(1, ft.Colors.GREY_700),
+    BALANCE_TEXT = {  # Настройки текста баланса
+        "size": 16,  # Размер шрифта
+        "color": ft.Colors.GREEN_400,  # Зеленый цвет текста
+        "weight": ft.FontWeight.BOLD,  # Жирный шрифт
     }
-    
-    
+
+    BALANCE_CONTAINER = {  # Настройки контейнера баланса
+        "padding": 10,  # Внутренние отступы
+        "bgcolor": ft.Colors.GREY_900,  # Цвет фона
+        "border_radius": 8,  # Скругление углов
+        "border": ft.border.all(1, ft.Colors.GREY_700),  # Граница контейнера
+    }
 
     @staticmethod
-    def set_window_size(page: ft.Page):
-        page.window.width = 600
-        page.window.height = 800
-        page.window.resizable = False
+    def set_window_size(page: ft.Page):  # Метод установки размера окна
+        page.window.width = 600  # Ширина окна
+        page.window.height = 800  # Высота окна
+        page.window.resizable = False  # Запрет изменения размера окна
+        
