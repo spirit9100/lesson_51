@@ -37,31 +37,73 @@
 
 ## Настройка
 
+### Windows
 1. Скопируйте `.env.example` в `.env` и настройте:
    ```
    OPENROUTER_API_KEY=ваш_ключ_api
    ```
 
 2. Установите зависимости:
-   ```bash
+   ```cmd
    pip install -r requirements.txt
+   ```
+
+### Linux
+1. Скопируйте `.env.example` в `.env` и настройте:
+   ```bash
+   cp .env.example .env
+   nano .env  # или любой другой редактор
+   ```
+
+2. Установите зависимости:
+   ```bash
+   python3 -m pip install -r requirements.txt
    ```
 
 ## Запуск
 
-Для запуска в режиме разработки:
-```bash
+### Windows
+```cmd
 python src/main.py
+```
+
+### Linux
+```bash
+python3 src/main.py
 ```
 
 ## Сборка Android APK
 
-1. Следуйте инструкциям в [INSTALL.md](INSTALL.md) для настройки среды сборки
+### Windows
+1. Следуйте инструкциям в [INSTALL.md](INSTALL.md) для настройки WSL и среды сборки
 2. Запустите сборку:
-   ```bash
+   ```cmd
    build.bat
    ```
-3. APK файл будет создан в директории `bin/`
+
+### Linux
+1. Следуйте инструкциям в [INSTALL.md](INSTALL.md) (пропустите раздел WSL)
+2. Запустите сборку:
+   ```bash
+   buildozer android clean
+   buildozer android debug
+   ```
+
+В обоих случаях APK файл будет создан в директории `bin/`.
+
+## Особенности сборки
+
+### Windows
+- Использует WSL (Windows Subsystem for Linux) для сборки
+- Процесс автоматизирован через build.bat
+- Файлы временно копируются в WSL
+- Требуется больше места на диске из-за WSL
+
+### Linux
+- Прямая сборка через buildozer
+- Не требует дополнительных систем
+- Более быстрый процесс сборки
+- Меньше накладных расходов
 
 ## Использование
 
