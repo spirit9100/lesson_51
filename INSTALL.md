@@ -1,138 +1,100 @@
-# Инструкция по установке среды сборки
+# Инструкция по установке и сборке
 
-Эта инструкция предназначена для Windows. Если вы используете Linux, вам не нужно устанавливать WSL - переходите сразу к разделу "Настройка зависимостей".
+## Системные требования
 
-## Различия между Windows и Linux
+- Windows 10/11 или Linux
+- Python 3.7 или выше
+- pip (Python package manager)
+- Flutter SDK (будет установлен автоматически скриптом сборки)
+- Android SDK (будет установлен автоматически через Flutter)
+- WiX Toolset (будет установлен автоматически скриптом сборки)
+- Минимум 10 ГБ свободного места на диске
+- Стабильное интернет-соединение
+- Права администратора (для установки WiX Toolset)
+
+## Установка зависимостей
+
+1. Установите Python с официального сайта:
+   https://www.python.org/downloads/
+
+2. Убедитесь, что Python и pip установлены корректно:
+```cmd
+python --version
+pip --version
+```
+
+3. Установите необходимые пакеты:
+```cmd
+pip install -r requirements.txt
+```
+
+## Сборка для Android
 
 ### Windows
-- Требуется установка WSL (Windows Subsystem for Linux)
-- Сборка происходит через build.bat
-- Файлы проекта копируются в WSL для сборки
-- Готовый APK копируется обратно в Windows
 
-### Linux
-- Не требуется WSL
-- Можно использовать buildozer напрямую
-- Команды для сборки:
-  ```bash
-  buildozer android clean
-  buildozer android debug
-  ```
-- APK создается сразу в директории bin/
-
-## Windows: Установка WSL
-
-1. Откройте PowerShell от администратора и выполните:
-```powershell
-wsl --install
-```
-
-2. Перезагрузите компьютер
-
-3. После перезагрузки автоматически запустится Ubuntu в консоли. Создайте пользователя и пароль.
-
-## 2. Настройка Ubuntu
-
-1. Обновите пакеты:
-```bash
-sudo apt update
-sudo apt upgrade -y
-```
-
-2. Установите необходимые системные зависимости:
-```bash
-sudo apt install -y python3 python3-pip git zip unzip openjdk-17-jdk python3-virtualenv autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
-```
-
-3. Установите дополнительные инструменты сборки:
-```bash
-sudo apt install -y build-essential libsqlite3-dev sqlite3 bzip2 libbz2-dev zlib1g-dev libssl-dev openssl libgdbm-dev libgdbm-compat-dev liblzma-dev libreadline-dev libncursesw5-dev libffi-dev uuid-dev
-```
-
-## 3. Установка зависимостей Python
-
-1. Создайте и активируйте виртуальное окружение:
-```bash
-python3 -m venv ~/venv
-source ~/venv/bin/activate
-```
-
-2. Установите все необходимые пакеты:
-```bash
-pip install appdirs==1.4.4 \
-    build==1.2.2.post1 \
-    buildozer==1.5.0 \
-    colorama==0.4.6 \
-    Cython==0.29.33 \
-    distlib==0.3.9 \
-    filelock==3.16.1 \
-    Jinja2==3.1.5 \
-    MarkupSafe==3.0.2 \
-    packaging==24.2 \
-    pexpect==4.9.0 \
-    platformdirs==4.3.6 \
-    ptyprocess==0.7.0 \
-    pyproject_hooks==1.2.0 \
-    python-for-android==2024.1.21 \
-    setuptools==75.6.0 \
-    sh==1.14.3 \
-    toml==0.10.2 \
-    virtualenv==20.28.0
-```
-
-## 4. Настройка переменных окружения
-
-Добавьте следующие строки в конец файла ~/.bashrc:
-```bash
-export PATH=$PATH:~/.local/bin
-export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-```
-
-Примените изменения:
-```bash
-source ~/.bashrc
-```
-
-## 5. Проверка установки
-
-1. Проверьте версию buildozer:
-```bash
-buildozer --version
-```
-
-2. Проверьте наличие Java:
-```bash
-java -version
-```
-
-## 6. Сборка проекта
-
-1. Перейдите в директорию с проектом в Windows
+1. Перейдите в директорию проекта
 2. Запустите сборку:
 ```cmd
-build.bat
+.\build.bat
 ```
 
-## Возможные проблемы
+### Linux
 
-1. Если возникает ошибка с правами доступа:
+1. Перейдите в директорию проекта
+2. Выполните команду:
 ```bash
-chmod -R 755 ~/aichat_build
+flet build apk
 ```
 
-2. Если buildozer не найден:
-```bash
-export PATH=$PATH:$HOME/.local/bin
-```
+3. APK файл будет создан в директории `build/` и автоматически перемещен в `bin/`
 
-3. Для очистки предыдущей сборки:
-```bash
-buildozer android clean
+## Установка на устройство
+
+### Android
+
+1. Включите режим разработчика на устройстве:
+   - Откройте Настройки
+   - Перейдите в "О телефоне"
+   - Нажмите 7 раз на "Номер сборки"
+   - Вернитесь в основные настройки
+   - Включите "Отладка по USB" в настройках разработчика
+
+2. Установите APK:
+   - Подключите устройство к компьютеру через USB
+   - Разрешите передачу файлов на устройстве
+   - Скопируйте APK из папки bin/ на устройство
+   - Откройте APK на устройстве и установите
+
+### Windows Subsystem for Android (WSA)
+
+1. Убедитесь что WSA установлен и включен режим разработчика:
+   - Откройте настройки WSA
+   - Включите "Режим разработчика"
+   - Запомните IP адрес и порт для подключения
+
+2. Установите APK через ADB:
+```cmd
+adb connect <ip:port>
+adb install bin\aichat-1.0-arm64-v8a-debug.apk
 ```
 
 ## Примечания
 
-- Первая сборка может занять 30-60 минут
-- Требуется минимум 10 ГБ свободного места
-- Логи сборки находятся в ~/.buildozer/logs/
-- Готовый APK будет в папке bin/ проекта
+- Первая сборка может занять 15-30 минут, так как:
+  - Устанавливается WiX Toolset (если не установлен)
+  - Скачивается и устанавливается Flutter SDK (~1.1 GB)
+  - Устанавливается Android SDK через Flutter
+  - Загружаются все необходимые зависимости
+- При первом запуске build.bat:
+  1. Проверяется и устанавливается WiX Toolset (если не установлен)
+  2. Проверяется наличие Flutter
+  3. Если Flutter не найден, скачивается и устанавливается автоматически
+  4. Запускается flutter doctor для проверки окружения
+  5. Выполняется сборка APK
+- Логи сборки можно найти в папке `build/logs/`
+- При возникновении проблем:
+  1. Убедитесь что запускаете build.bat от имени администратора
+  2. Убедитесь что есть доступ в интернет
+  3. Проверьте наличие свободного места (минимум 10 ГБ)
+  4. Попробуйте запустить build.bat повторно
+  5. Проверьте логи в папке `build/logs/`
