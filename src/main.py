@@ -57,7 +57,7 @@ class ChatApp:
     def update_balance(self):
         """Обновление отображения баланса"""
         try:
-            balance = self.api_client.get_balance()    # Получение баланса через API
+            balance = self.api_client.get_balance()         # Получение баланса через API
             self.balance_text.value = f"Баланс: {balance}"  # Обновление текста баланса
             self.balance_text.color = ft.Colors.GREEN_400   # Установка зеленого цвета
         except Exception as e:
@@ -218,26 +218,71 @@ class ChatApp:
 
         async def clear_history(e):
             """Очистка истории чата"""
-            # Очистка данных
-            self.chat_history.controls.clear()    # Очистка визуального списка
-            self.cache.clear_history()            # Очистка кэша
-            self.analytics.clear_data()           # Очистка аналитики
-            
-            # Обновляем страницу сразу после очистки
-            page.update()
+            try:
+                # Очистка данных
+                self.cache.clear_history()            # Очистка кэша
+                self.analytics.clear_data()           # Очистка аналитики
+                
+                # Очищаем историю чата
+                self.chat_history.controls = []
+                
+                # Сброс поля ввода и его состояния
+                self.message_input.value = ""
+                self.message_input.border_color = ft.Colors.BLUE_400
+                self.message_input.bgcolor = ft.Colors.GREY_800
+                self.message_input.disabled = False
+                
+                # Сброс состояния поля поиска модели
+                self.model_dropdown.search_field.value = ""
+                self.model_dropdown.search_field.border_color = ft.Colors.GREY_700
+                self.model_dropdown.search_field.bgcolor = ft.Colors.GREY_900
+                
+                # Сброс состояния выпадающего списка
+                self.model_dropdown.options = self.model_dropdown.all_options
+                self.model_dropdown.border_color = ft.Colors.GREY_700
+                self.model_dropdown.bgcolor = ft.Colors.GREY_900
+                self.model_dropdown.value = self.api_client.available_models[0]['id'] if self.api_client.available_models else None
+                
+                # Убеждаемся что все элементы управления активны
+                self.message_input.disabled = False
+                self.model_dropdown.disabled = False
+                self.model_dropdown.search_field.disabled = False
+                send_button.disabled = False
+                save_button.disabled = False
+                clear_button.disabled = False
+                analytics_button.disabled = False
+                
+                # Обновляем все компоненты
+                self.chat_history.update()
+                self.message_input.update()
+                self.model_dropdown.update()
+                self.model_dropdown.search_field.update()
+                send_button.update()
+                save_button.update()
+                clear_button.update()
+                analytics_button.update()
+                
+                # Убеждаемся что нет открытых диалогов
+                page.overlay.clear()
+                
+                # Финальное обновление страницы
+                page.update()
 
-            # Показ уведомления об успешной очистке
-            snack = ft.SnackBar(
-                content=ft.Text(
-                   "История чата успешно очищена",
-                    color=ft.Colors.WHITE
-                ),
-                bgcolor=ft.Colors.GREEN_700,
-                duration=3000,
-            )
-            page.overlay.append(snack)
-            snack.open = True
-            page.update()
+                # Показ уведомления об успешной очистке
+                snack = ft.SnackBar(
+                    content=ft.Text(
+                       "История чата успешно очищена",
+                        color=ft.Colors.WHITE
+                    ),
+                    bgcolor=ft.Colors.GREEN_700,
+                    duration=3000,
+                )
+                page.overlay.append(snack)
+                snack.open = True
+                page.update()
+            except Exception as e:
+                self.logger.error(f"Ошибка очистки истории: {e}")
+                show_error_snack(page, f"Ошибка очистки истории: {str(e)}")
 
         async def confirm_clear_history(e):
             """Подтверждение очистки истории"""
@@ -385,7 +430,7 @@ class ChatApp:
         )
 
         # Создание основной колонки приложения
-        main_column = ft.Column(
+        self.main_column = ft.Column(
             controls=[                            # Размещение основных элементов
                 model_selection,
                 self.chat_history,
@@ -395,19 +440,9 @@ class ChatApp:
         )
 
         # Добавление основной колонки на страницу
-        page.add(main_column)
+        page.add(self.main_column)
         
         
-        # Настройка обработки нажатия Enter
-        def on_message_key(e):
-            """Обработчик нажатия клавиш в поле ввода"""
-            if e.key == "Enter" and e.shift:      # Проверка комбинации Shift+Enter
-                asyncio.create_task(send_message_click(e))  # Асинхронная отправка
-
-        # Привязка обработчика к полю ввода
-        self.message_input.on_key_event = on_message_key
-
-        # Получение метрик
         self.monitor.get_metrics()
 
         # Логирование запуска
