@@ -3,4 +3,3 @@ flet-core>=0.24.1
 flet-runtime>=0.24.1
 python-dotenv>=1.0.0
 requests>=2.32.3
-flutter-sdk>=3.16.5
