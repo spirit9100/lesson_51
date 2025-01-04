@@ -46,6 +46,15 @@ temp/
 /build/
 *.apk
 *.aab
+android/
+ios/
+linux/
+macos/
+web/
+windows/
+test/
+export/
+.metadata
 
 # Environment variables
 .env
