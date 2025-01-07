@@ -4,13 +4,8 @@ import os  # Для работы с переменными окружения
 from dotenv import load_dotenv  # Для загрузки переменных из .env файла
 from utils.logger import AppLogger  # Импорт нашего логгера
 
-# Встроенные переменные окружения
-os.environ["OPENROUTER_API_KEY"] = "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"
-os.environ["BASE_URL"] = "https://openrouter.ai/api/v1"
-os.environ["DEBUG"] = "False"
-os.environ["LOG_LEVEL"] = "INFO"
-os.environ["MAX_TOKENS"] = "1000"
-os.environ["TEMPERATURE"] = "0.7"
+# Загрузка переменных окружения из .env файла
+load_dotenv()
 
 class OpenRouterClient:
     """Client for interacting with OpenRouter API"""

@@ -1,9 +1,0 @@
-[
-  {
-    "timestamp": "2024-12-22 00:15:32.312947",
-    "model": "deepseek/deepseek-chat",
-    "user_message": "Напиши простой цикл в Python",
-    "ai_response": "Конечно! Вот пример простого цикла `for` в Python:\n\n```python\n# Цикл for, который выводит числа от 1 до 5\nfor i in range(1, 6):\n    print(i)\n```\n\nЭтот код выведет:\n\n```\n1\n2\n3\n4\n5\n```\n\nЕсли нужен цикл `while`, вот пример:\n\n```python\n# Цикл while, который выводит числа от 1 до 5\ni = 1\nwhile i <= 5:\n    print(i)\n    i += 1\n```\n\nОба цикла делают одно и то же: выводят числа от 1 до 5.",
-    "tokens_used": 195
-  }
-]
