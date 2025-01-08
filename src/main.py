@@ -219,67 +219,14 @@ class ChatApp:
         async def clear_history(e):
             """Очистка истории чата"""
             try:
-                # Очистка данных
-                self.cache.clear_history()            # Очистка кэша
-                self.analytics.clear_data()           # Очистка аналитики
+                # Очищаем данные и историю
+                self.cache.clear_history()
+                self.analytics.clear_data()
+                self.chat_history.controls.clear()
                 
-                # Очищаем историю чата
-                self.chat_history.controls = []
+                # Обновляем главную колонку
+                self.main_column.update()
                 
-                # Сброс поля ввода и его состояния
-                self.message_input.value = ""
-                self.message_input.border_color = ft.Colors.BLUE_400
-                self.message_input.bgcolor = ft.Colors.GREY_800
-                self.message_input.disabled = False
-                
-                # Сброс состояния поля поиска модели
-                self.model_dropdown.search_field.value = ""
-                self.model_dropdown.search_field.border_color = ft.Colors.GREY_700
-                self.model_dropdown.search_field.bgcolor = ft.Colors.GREY_900
-                
-                # Сброс состояния выпадающего списка
-                self.model_dropdown.options = self.model_dropdown.all_options
-                self.model_dropdown.border_color = ft.Colors.GREY_700
-                self.model_dropdown.bgcolor = ft.Colors.GREY_900
-                self.model_dropdown.value = self.api_client.available_models[0]['id'] if self.api_client.available_models else None
-                
-                # Убеждаемся что все элементы управления активны
-                self.message_input.disabled = False
-                self.model_dropdown.disabled = False
-                self.model_dropdown.search_field.disabled = False
-                send_button.disabled = False
-                save_button.disabled = False
-                clear_button.disabled = False
-                analytics_button.disabled = False
-                
-                # Обновляем все компоненты
-                self.chat_history.update()
-                self.message_input.update()
-                self.model_dropdown.update()
-                self.model_dropdown.search_field.update()
-                send_button.update()
-                save_button.update()
-                clear_button.update()
-                analytics_button.update()
-                
-                # Убеждаемся что нет открытых диалогов
-                page.overlay.clear()
-                
-                # Финальное обновление страницы
-                page.update()
-
-                # Показ уведомления об успешной очистке
-                snack = ft.SnackBar(
-                    content=ft.Text(
-                       "История чата успешно очищена",
-                        color=ft.Colors.WHITE
-                    ),
-                    bgcolor=ft.Colors.GREEN_700,
-                    duration=3000,
-                )
-                page.overlay.append(snack)
-                snack.open = True
-                page.update()
             except Exception as e:
                 self.logger.error(f"Ошибка очистки истории: {e}")
                 show_error_snack(page, f"Ошибка очистки истории: {str(e)}")
@@ -312,9 +259,12 @@ class ChatApp:
         def close_dialog(dialog):
             """Закрытие диалогового окна"""
             dialog.open = False                   # Закрытие диалога
-            page.update()                         # Обновление страницы
+                                    
             if dialog in page.overlay:            # Удаление из overlay
                 page.overlay.remove(dialog)
+                
+            # Обновление страницы    
+            page.update()     
                 
         async def save_dialog(e):
             """Сохранение диалога в файл"""
