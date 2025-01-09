@@ -14,9 +14,9 @@
 2. **Клонирование проекта**
    ```bash
    # Клонируйте репозиторий
-   git clone https://github.com/yourusername/AIChat.git
+   git clone https://github.com/neuro-fill/51-lesson.git
    # Перейдите в директорию проекта
-   cd AIChat
+   cd 51-lesson
    ```
 
 3. **Настройка VSCode**
@@ -25,7 +25,7 @@
      - Python (ms-python.python)
      - Python Environment Manager
      - Python Extension Pack
-   - Откройте проект: File -> Open Folder -> выберите папку AIChat
+   - Откройте проект: File -> Open Folder -> выберите папку 51-lesson
    - Выберите интерпретатор Python: 
      1. Нажмите F1 или Ctrl+Shift+P
      2. Введите "Python: Select Interpreter"

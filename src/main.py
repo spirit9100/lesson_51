@@ -1,45 +1,61 @@
-import flet as ft                                  # Фреймворк для создания UI
-from api.openrouter import OpenRouterClient        # Клиент для работы с AI API
-from ui.styles import AppStyles                    # Стили приложения
-from ui.components import MessageBubble, ModelSelector  # UI компоненты
-from utils.cache import ChatCache                  # Система кэширования
-from utils.logger import AppLogger                 # Система логирования
-from utils.analytics import Analytics              # Система аналитики
-from utils.monitor import PerformanceMonitor       # Мониторинг производительности
-import asyncio                                     # Для асинхронных операций
-import time                                        # Для работы со временем
-import json                                        # Для работы с JSON
-from datetime import datetime                      # Для работы с датой/временем
-import os                                          # Для работы с файловой системой
+# Импорт необходимых библиотек и модулей
+import flet as ft                                  # Фреймворк для создания кроссплатформенных приложений с современным UI
+from api.openrouter import OpenRouterClient        # Клиент для взаимодействия с AI API через OpenRouter
+from ui.styles import AppStyles                    # Модуль с настройками стилей интерфейса
+from ui.components import MessageBubble, ModelSelector  # Компоненты пользовательского интерфейса
+from utils.cache import ChatCache                  # Модуль для кэширования истории чата
+from utils.logger import AppLogger                 # Модуль для логирования работы приложения
+from utils.analytics import Analytics              # Модуль для сбора и анализа статистики использования
+from utils.monitor import PerformanceMonitor       # Модуль для мониторинга производительности
+import asyncio                                     # Библиотека для асинхронного программирования
+import time                                        # Библиотека для работы с временными метками
+import json                                        # Библиотека для работы с JSON-данными
+from datetime import datetime                      # Класс для работы с датой и временем
+import os                                          # Библиотека для работы с операционной системой
 
 class ChatApp:
+    """
+    Основной класс приложения чата.
+    Управляет всей логикой работы приложения, включая UI и взаимодействие с API.
+    """
     def __init__(self):
+        """
+        Инициализация основных компонентов приложения:
+        - API клиент для связи с языковой моделью
+        - Система кэширования для сохранения истории
+        - Система логирования для отслеживания работы
+        - Система аналитики для сбора статистики
+        - Система мониторинга для отслеживания производительности
+        """
         # Инициализация основных компонентов
-        self.api_client = OpenRouterClient()       # Создание клиента API
-        self.cache = ChatCache()                   # Инициализация кэша
-        self.logger = AppLogger()                  # Инициализация логгера
-        self.analytics = Analytics()               # Инициализация аналитики
-        self.monitor = PerformanceMonitor()        # Инициализация мониторинга
+        self.api_client = OpenRouterClient()       # Создание клиента для работы с AI API
+        self.cache = ChatCache()                   # Инициализация системы кэширования
+        self.logger = AppLogger()                  # Инициализация системы логирования
+        self.analytics = Analytics()               # Инициализация системы аналитики
+        self.monitor = PerformanceMonitor()        # Инициализация системы мониторинга
 
-        # Создание текста для отображения баланса
+        # Создание компонента для отображения баланса API
         self.balance_text = ft.Text(
-            "Баланс: Загрузка...",
-            **AppStyles.BALANCE_TEXT
+            "Баланс: Загрузка...",                # Начальный текст до загрузки реального баланса
+            **AppStyles.BALANCE_TEXT               # Применение стилей из конфигурации
         )
-        self.update_balance()                      # Обновление баланса
+        self.update_balance()                      # Первичное обновление баланса
 
-        # Создание директории для экспорта
-        self.exports_dir = "exports"
-        os.makedirs(self.exports_dir, exist_ok=True)  # Создание папки если её нет
+        # Создание директории для экспорта истории чата
+        self.exports_dir = "exports"               # Путь к директории экспорта
+        os.makedirs(self.exports_dir, exist_ok=True)  # Создание директории, если её нет
         
     def load_chat_history(self):
-        """Загрузка истории чата из кэша"""
+        """
+        Загрузка истории чата из кэша и отображение её в интерфейсе.
+        Сообщения добавляются в обратном порядке для правильной хронологии.
+        """
         try:
             history = self.cache.get_chat_history()    # Получение истории из кэша
             for msg in reversed(history):              # Перебор сообщений в обратном порядке
-                # Распаковка данных сообщения
+                # Распаковка данных сообщения в отдельные переменные
                 _, model, user_message, ai_response, timestamp, tokens = msg
-                # Добавление сообщений в интерфейс
+                # Добавление пары сообщений (пользователь + AI) в интерфейс
                 self.chat_history.controls.extend([
                     MessageBubble(                     # Создание пузырька сообщения пользователя
                         message=user_message,
@@ -51,45 +67,49 @@ class ChatApp:
                     )
                 ])
         except Exception as e:
-            # Логирование ошибки при загрузке
+            # Логирование ошибки при загрузке истории
             self.logger.error(f"Ошибка загрузки истории чата: {e}")
 
     def update_balance(self):
-        """Обновление отображения баланса"""
+        """
+        Обновление отображения баланса API в интерфейсе.
+        При успешном получении баланса показывает его зеленым цветом,
+        при ошибке - красным с текстом 'н/д' (не доступен).
+        """
         try:
-            balance = self.api_client.get_balance()         # Получение баланса через API
-            self.balance_text.value = f"Баланс: {balance}"  # Обновление текста баланса
-            self.balance_text.color = ft.Colors.GREEN_400   # Установка зеленого цвета
+            balance = self.api_client.get_balance()         # Запрос баланса через API
+            self.balance_text.value = f"Баланс: {balance}"  # Обновление текста с балансом
+            self.balance_text.color = ft.Colors.GREEN_400   # Установка зеленого цвета для успешного получения
         except Exception as e:
             # Обработка ошибки получения баланса
-            self.balance_text.value = "Баланс: н/д"
-            self.balance_text.color = ft.Colors.RED_400     # Установка красного цвета
+            self.balance_text.value = "Баланс: н/д"         # Установка текста ошибки
+            self.balance_text.color = ft.Colors.RED_400     # Установка красного цвета для ошибки
             self.logger.error(f"Ошибка обновления баланса: {e}")
             
-            
     def main(self, page: ft.Page):
-        # Применение настроек страницы из стилей
+        """
+        Основная функция инициализации интерфейса приложения.
+        Создает все элементы UI и настраивает их взаимодействие.
+        
+        Args:
+            page (ft.Page): Объект страницы Flet для размещения элементов интерфейса
+        """
+        # Применение базовых настроек страницы из конфигурации стилей
         for key, value in AppStyles.PAGE_SETTINGS.items():
             setattr(page, key, value)
 
-        AppStyles.set_window_size(page)    # Установка размера окна
+        AppStyles.set_window_size(page)    # Установка размеров окна приложения
 
-        # Инициализация компонентов выбора модели
+        # Инициализация выпадающего списка для выбора модели AI
         models = self.api_client.available_models
         self.model_dropdown = ModelSelector(models)
         self.model_dropdown.value = models[0] if models else None
 
-        # Создание компонентов интерфейса
-        self.message_input = ft.TextField(**AppStyles.MESSAGE_INPUT)    # Поле ввода
-        self.chat_history = ft.ListView(**AppStyles.CHAT_HISTORY)       # История чата
-
-        # Загрузка существующей истории
-        self.load_chat_history()
-        
-        
         async def send_message_click(e):
-            """Асинхронная функция отправки сообщения"""
-            if not self.message_input.value:   # Проверка наличия текста
+            """
+            Асинхронная функция отправки сообщения.
+            """
+            if not self.message_input.value:
                 return
 
             try:
@@ -100,7 +120,7 @@ class ChatApp:
                 # Сохранение данных сообщения
                 start_time = time.time()
                 user_message = self.message_input.value
-                self.message_input.value = ""   # Очистка поля ввода
+                self.message_input.value = ""
                 page.update()
 
                 # Добавление сообщения пользователя
@@ -162,7 +182,6 @@ class ChatApp:
                 page.update()
 
             except Exception as e:
-                # Обработка ошибок
                 self.logger.error(f"Ошибка отправки сообщения: {e}")
                 self.message_input.border_color = ft.Colors.RED_500
 
@@ -179,7 +198,7 @@ class ChatApp:
                 page.overlay.append(snack)
                 snack.open = True
                 page.update()
-                
+
         def show_error_snack(page, message: str):
             """Показ уведомления об ошибке"""
             snack = ft.SnackBar(                  # Создание уведомления
@@ -193,6 +212,7 @@ class ChatApp:
             page.overlay.append(snack)            # Добавление уведомления
             snack.open = True                     # Открытие уведомления
             page.update()                         # Обновление страницы
+
 
         async def show_analytics(e):
             """Показ статистики использования"""
@@ -217,19 +237,18 @@ class ChatApp:
             page.update()                         # Обновление страницы
 
         async def clear_history(e):
-            """Очистка истории чата"""
+            """
+            Очистка истории чата.
+            """
             try:
-                # Очищаем данные и историю
-                self.cache.clear_history()
-                self.analytics.clear_data()
-                self.chat_history.controls.clear()
-                
-                # Обновляем главную колонку
-                self.main_column.update()
+                self.cache.clear_history()          # Очистка кэша
+                self.analytics.clear_data()         # Очистка аналитики
+                self.chat_history.controls.clear()  # Очистка истории чата
                 
             except Exception as e:
                 self.logger.error(f"Ошибка очистки истории: {e}")
                 show_error_snack(page, f"Ошибка очистки истории: {str(e)}")
+
 
         async def confirm_clear_history(e):
             """Подтверждение очистки истории"""
@@ -237,8 +256,9 @@ class ChatApp:
                 close_dialog(dialog)
 
             async def clear_confirmed(e):         # Функция подтверждения очистки
-                close_dialog(dialog)
                 await clear_history(e)
+                close_dialog(dialog)
+                
 
             # Создание диалога подтверждения
             dialog = ft.AlertDialog(
@@ -255,19 +275,20 @@ class ChatApp:
             page.overlay.append(dialog)
             dialog.open = True
             page.update()
-
+            
         def close_dialog(dialog):
             """Закрытие диалогового окна"""
             dialog.open = False                   # Закрытие диалога
+            page.update()                         # Обновление страницы
                                     
             if dialog in page.overlay:            # Удаление из overlay
                 page.overlay.remove(dialog)
-                
-            # Обновление страницы    
-            page.update()     
-                
+      
+
         async def save_dialog(e):
-            """Сохранение диалога в файл"""
+            """
+            Сохранение истории диалога в JSON файл.
+            """
             try:
                 # Получение истории из кэша
                 history = self.cache.get_chat_history()
@@ -293,6 +314,7 @@ class ChatApp:
 
                 # Создание диалога успешного сохранения
                 dialog = ft.AlertDialog(
+                    modal=True,
                     title=ft.Text("Диалог сохранен"),
                     content=ft.Column([
                         ft.Text("Путь сохранения:"),
@@ -313,54 +335,65 @@ class ChatApp:
             except Exception as e:
                 self.logger.error(f"Ошибка сохранения: {e}")
                 show_error_snack(page, f"Ошибка сохранения: {str(e)}")
-                
-        # Создание основных кнопок управления
+
+    
+
+        # Создание компонентов интерфейса
+        self.message_input = ft.TextField(**AppStyles.MESSAGE_INPUT) # Поле ввода
+        self.chat_history = ft.ListView(**AppStyles.CHAT_HISTORY)    # История чата
+
+        # Загрузка существующей истории
+        self.load_chat_history()
+
+        # Создание кнопок управления
         save_button = ft.ElevatedButton(
-            on_click=save_dialog,                 # Привязка функции сохранения
-            **AppStyles.SAVE_BUTTON              # Применение стилей
+            on_click=save_dialog,           # Привязка функции сохранения
+            **AppStyles.SAVE_BUTTON         # Применение стилей
         )
 
         clear_button = ft.ElevatedButton(
-            on_click=confirm_clear_history,       # Привязка функции очистки
-            **AppStyles.CLEAR_BUTTON             # Применение стилей
+            on_click=confirm_clear_history, # Привязка функции очистки
+            **AppStyles.CLEAR_BUTTON        # Применение стилей
         )
 
         send_button = ft.ElevatedButton(
-            on_click=send_message_click,          # Привязка функции отправки
-            **AppStyles.SEND_BUTTON              # Применение стилей
+            on_click=send_message_click,    # Привязка функции отправки
+            **AppStyles.SEND_BUTTON         # Применение стилей
         )
 
         analytics_button = ft.ElevatedButton(
-            on_click=show_analytics,              # Привязка функции аналитики
-            **AppStyles.ANALYTICS_BUTTON         # Применение стилей
+            on_click=show_analytics,        # Привязка функции аналитики
+            **AppStyles.ANALYTICS_BUTTON    # Применение стилей
         )
 
+        # Создание layout компонентов
+        
         # Создание ряда кнопок управления
-        control_buttons = ft.Row(
-            controls=[                            # Размещение кнопок в ряд
+        control_buttons = ft.Row(  
+            controls=[                      # Размещение кнопок в ряд
                 save_button,
                 analytics_button,
                 clear_button
             ],
-            **AppStyles.CONTROL_BUTTONS_ROW      # Применение стилей к ряду
+            **AppStyles.CONTROL_BUTTONS_ROW # Применение стилей к ряду
         )
 
         # Создание строки ввода с кнопкой отправки
         input_row = ft.Row(
-            controls=[                            # Размещение элементов ввода
+            controls=[                      # Размещение элементов ввода
                 self.message_input,
                 send_button
             ],
-            **AppStyles.INPUT_ROW               # Применение стилей к строке ввода
+            **AppStyles.INPUT_ROW           # Применение стилей к строке ввода
         )
 
         # Создание колонки для элементов управления
         controls_column = ft.Column(
-            controls=[                            # Размещение элементов управления
+            controls=[                      # Размещение элементов управления
                 input_row,
                 control_buttons
             ],
-            **AppStyles.CONTROLS_COLUMN         # Применение стилей к колонке
+            **AppStyles.CONTROLS_COLUMN     # Применение стилей к колонке
         )
 
         # Создание контейнера для баланса
@@ -379,22 +412,22 @@ class ChatApp:
             **AppStyles.MODEL_SELECTION_COLUMN   # Применение стилей к колонке
         )
 
-        # Создание основной колонки приложения
+                # Создание основной колонки приложения
         self.main_column = ft.Column(
             controls=[                            # Размещение основных элементов
                 model_selection,
                 self.chat_history,
                 controls_column
             ],
-            **AppStyles.MAIN_COLUMN             # Применение стилей к главной колонке
+            **AppStyles.MAIN_COLUMN               # Применение стилей к главной колонке
         )
 
         # Добавление основной колонки на страницу
         page.add(self.main_column)
         
-        
+        # Запуск монитора
         self.monitor.get_metrics()
-
+        
         # Логирование запуска
         self.logger.info("Приложение запущено")
 

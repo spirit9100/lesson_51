@@ -1,21 +1,30 @@
-import os
-import sys
-import shutil
-import subprocess
-from pathlib import Path
+# Импортируем необходимые стандартные библиотеки Python
+import os  # Для работы с операционной системой
+import sys  # Для доступа к системным параметрам и функциям
+import shutil  # Для операций с файлами и директориями
+import subprocess  # Для запуска внешних процессов
+from pathlib import Path  # Для удобной работы с путями файловой системы
 
 def build_windows():
-    """Build Windows executable using PyInstaller"""
+    """Сборка исполняемого файла для Windows с помощью PyInstaller"""
     print("Building Windows executable...")
     
-    # Install Windows requirements
+    # Устанавливаем зависимости проекта для Windows из файла requirements.txt
+    # sys.executable - путь к текущему интерпретатору Python
     subprocess.run([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
     
-    # Create bin directory if it doesn't exist
+    # Создаём директорию bin, если она не существует
+    # exist_ok=True позволяет не выбрасывать ошибку, если директория уже существует
     bin_dir = Path("bin")
     bin_dir.mkdir(exist_ok=True)
     
-    # Build executable
+    # Запускаем PyInstaller со следующими параметрами:
+    # --onefile: создать один исполняемый файл
+    # --windowed: запускать без консольного окна
+    # --name: задать имя выходного файла
+    # --clean: очистить кэш PyInstaller перед сборкой
+    # --noupx: не использовать UPX для сжатия
+    # --uac-admin: запрашивать права администратора при запуске
     subprocess.run([
         "pyinstaller",
         "--onefile",
@@ -27,7 +36,8 @@ def build_windows():
         "src/main.py"
     ])
     
-    # Move executable to bin directory
+    # Перемещаем собранный файл в директорию bin
+    # Используем try/except для обработки возможных ошибок при перемещении
     try:
         shutil.move("dist/AI Chat.exe", "bin/AIChat.exe")
         print("Windows build completed! Executable location: bin/AIChat.exe")
@@ -35,17 +45,21 @@ def build_windows():
         print("Windows build completed! Executable location: dist/AI Chat.exe")
 
 def build_linux():
-    """Build Linux executable using PyInstaller"""
+    """Сборка исполняемого файла для Linux с помощью PyInstaller"""
     print("Building Linux executable...")
     
-    # Install requirements
+    # Устанавливаем зависимости проекта для Linux
     subprocess.run([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
     
-    # Create bin directory if it doesn't exist
+    # Создаём директорию bin, если она не существует
     bin_dir = Path("bin")
     bin_dir.mkdir(exist_ok=True)
     
-    # Build executable
+    # Запускаем PyInstaller для Linux со следующими параметрами:
+    # --onefile: создать один исполняемый файл
+    # --windowed: запускать без консольного окна
+    # --icon: указать иконку приложения
+    # --name: задать имя выходного файла
     subprocess.run([
         "pyinstaller",
         "--onefile",
@@ -55,7 +69,7 @@ def build_linux():
         "src/main.py"
     ])
     
-    # Move executable to bin directory
+    # Перемещаем собранный файл в директорию bin
     try:
         shutil.move("dist/aichat", "bin/aichat")
         print("Linux build completed! Executable location: bin/aichat")
@@ -63,13 +77,20 @@ def build_linux():
         print("Linux build completed! Executable location: dist/aichat")
 
 def main():
-    """Main build function"""
-    if sys.platform.startswith('win'):
+    """Основная функция сборки
+    
+    Определяет операционную систему и запускает соответствующую функцию сборки
+    """
+    # Проверяем тип операционной системы
+    if sys.platform.startswith('win'):  # Если Windows
         build_windows()
-    elif sys.platform.startswith('linux'):
+    elif sys.platform.startswith('linux'):  # Если Linux
         build_linux()
-    else:
+    else:  # Если другая ОС
         print("Unsupported platform")
 
+# Точка входа в скрипт
+# Если скрипт запущен напрямую (не импортирован как модуль),
+# то запускаем основную функцию
 if __name__ == "__main__":
     main()
