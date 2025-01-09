@@ -67,7 +67,7 @@ class ChatCache:
         conn = sqlite3.connect(self.db_name)
         cursor = conn.cursor()
         
-        # SQL запрос для создания таблицы messages
+        # SQL запросы для создания таблиц
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS messages (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,  -- Уникальный ID сообщения
@@ -78,6 +78,18 @@ class ChatCache:
                 tokens_used INTEGER                   -- Использовано токенов
             )
         ''')
+        
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS analytics_messages (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp DATETIME,
+                model TEXT,
+                message_length INTEGER,
+                response_time FLOAT,
+                tokens_used INTEGER
+            )
+        ''')
+        
         conn.commit()  # Сохранение изменений в базе
         conn.close()   # Закрытие соединения
 
@@ -122,6 +134,44 @@ class ChatCache:
             LIMIT ?
         ''', (limit,))
         return cursor.fetchall()  # Возврат всех найденных записей
+
+    def save_analytics(self, timestamp, model, message_length, response_time, tokens_used):
+        """
+        Сохранение данных аналитики в базу данных.
+        
+        Args:
+            timestamp (datetime): Время создания записи
+            model (str): Идентификатор использованной модели
+            message_length (int): Длина сообщения
+            response_time (float): Время ответа
+            tokens_used (int): Количество использованных токенов
+        """
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            INSERT INTO analytics_messages 
+            (timestamp, model, message_length, response_time, tokens_used)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (timestamp, model, message_length, response_time, tokens_used))
+        conn.commit()
+
+    def get_analytics_history(self):
+        """
+        Получение всей истории аналитики.
+        
+        Returns:
+            list: Список записей аналитики
+        """
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT timestamp, model, message_length, response_time, tokens_used
+            FROM analytics_messages
+            ORDER BY timestamp ASC
+        ''')
+        return cursor.fetchall()
 
     def __del__(self):
         """

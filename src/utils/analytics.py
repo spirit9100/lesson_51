@@ -14,30 +14,53 @@ class Analytics:
     - Общую длительность сессии
     """
 
-    def __init__(self):
+    def __init__(self, cache):
         """
         Инициализация системы аналитики.
+        
+        Args:
+            cache (ChatCache): Экземпляр класса для работы с базой данных
         
         Создает необходимые структуры данных для хранения:
         - Времени начала сессии
         - Статистики использования моделей
         - Детальных данных о каждом сообщении
         """
-        # Сохранение времени запуска для расчета длительности сессии
+        self.cache = cache
         self.start_time = time.time()
-        
-        # Словарь для хранения статистики по каждой модели
-        # Формат: {
-        #     'model_name': {
-        #         'count': количество_использований,
-        #         'tokens': общее_количество_токенов
-        #     }
-        # }
         self.model_usage = {}
-        
-        # Список для хранения подробной информации о каждом сообщении
-        # Каждый элемент - словарь с метриками конкретного сообщения
         self.session_data = []
+        
+        # Загрузка исторических данных из базы
+        self._load_historical_data()
+        
+    def _load_historical_data(self):
+        """
+        Загрузка исторических данных из базы данных.
+        Обновляет статистику использования моделей и сессионные данные.
+        """
+        history = self.cache.get_analytics_history()
+        
+        for record in history:
+            timestamp, model, message_length, response_time, tokens_used = record
+            
+            # Обновление статистики моделей
+            if model not in self.model_usage:
+                self.model_usage[model] = {
+                    'count': 0,
+                    'tokens': 0
+                }
+            self.model_usage[model]['count'] += 1
+            self.model_usage[model]['tokens'] += tokens_used
+            
+            # Добавление в сессионные данные
+            self.session_data.append({
+                'timestamp': datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S.%f'),
+                'model': model,
+                'message_length': message_length,
+                'response_time': response_time,
+                'tokens_used': tokens_used
+            })
 
     def track_message(self, model: str, message_length: int, response_time: float, tokens_used: int):
         """
@@ -52,6 +75,11 @@ class Analytics:
             response_time (float): Время ответа в секундах
             tokens_used (int): Количество использованных токенов
         """
+        timestamp = datetime.now()
+        
+        # Сохранение в базу данных
+        self.cache.save_analytics(timestamp, model, message_length, response_time, tokens_used)
+        
         # Инициализация статистики для новой модели при первом использовании
         if model not in self.model_usage:
             self.model_usage[model] = {
@@ -65,7 +93,7 @@ class Analytics:
 
         # Сохранение подробной информации о сообщении
         self.session_data.append({
-            'timestamp': datetime.now(),      # Время отправки сообщения
+            'timestamp': timestamp,           # Время отправки сообщения
             'model': model,                   # Использованная модель
             'message_length': message_length, # Длина сообщения
             'response_time': response_time,   # Время ответа

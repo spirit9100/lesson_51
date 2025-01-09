@@ -31,7 +31,7 @@ class ChatApp:
         self.api_client = OpenRouterClient()       # Создание клиента для работы с AI API
         self.cache = ChatCache()                   # Инициализация системы кэширования
         self.logger = AppLogger()                  # Инициализация системы логирования
-        self.analytics = Analytics()               # Инициализация системы аналитики
+        self.analytics = Analytics(self.cache)     # Инициализация системы аналитики с передачей кэша
         self.monitor = PerformanceMonitor()        # Инициализация системы мониторинга
 
         # Создание компонента для отображения баланса API
